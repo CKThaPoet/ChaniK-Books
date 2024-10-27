@@ -4,81 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="books.css">
-    <link rel="import" href="books.json">
     <title>Book Rating</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        .book-container {
+        #book-container {
             background-color: #fff;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: 20px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
         }
-        .rating {
+        #rating-form {
             margin-top: 20px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <div class="book-container" id="book-container">
-        <h2 id="book-title"></h2>
-        <p><strong>Author:</strong> <span id="book-author"></span></p>
-        <p><strong>Year:</strong> <span id="book-year"></span></p>
-        <p><strong>Genre:</strong> <span id="book-genre"></span></p>
-        <p><strong>Publisher:</strong> <span id="book-publisher"></span></p>
-
-        <div class="rating">
-            <p>Rate this book:</p>
-            <label><input type="radio" name="rating" value="1"> 1</label>
-            <label><input type="radio" name="rating" value="2"> 2</label>
-            <label><input type="radio" name="rating" value="3"> 3</label>
-            <label><input type="radio" name="rating" value="4"> 4</label>
-            <label><input type="radio" name="rating" value="5"> 5</label>
-            <label><input type="radio" name="rating" value="haven't read"> Haven't read it</label>
-        </div>
-
-        <button onclick="nextBook()">Next Book</button>
+    <div id="book-container">
+        <h2 id="book-title">Loading...</h2>
+        <form id="rating-form">
+            <label>
+                <input type="radio" name="rating" value="1"> 1
+            </label><br>
+            <label>
+                <input type="radio" name="rating" value="2"> 2
+            </label><br>
+            <label>
+                <input type="radio" name="rating" value="3"> 3
+            </label><br>
+            <label>
+                <input type="radio" name="rating" value="4"> 4
+            </label><br>
+            <label>
+                <input type="radio" name="rating" value="5"> 5
+            </label><br>
+            <label>
+                <input type="radio" name="rating" value="haven't read"> Haven't read it
+            </label><br>
+        </form>
+        <button id="next-book">Next Book</button>
     </div>
 
     <script>
-        const books = [
-            // Paste the JSON content here
-        ];
-
+        let books = [];
         let currentIndex = 0;
-        const selectedBooks = getRandomBooks(books, 10);
 
-        function getRandomBooks(array, num) {
-            const shuffled = [...array].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, num);
+        // Fetch the JSON file
+        fetch('books.json')
+            .then(response => response.json())
+            .then(data => {
+                books = getRandomBooks(data, 10);
+                displayBook();
+            })
+            .catch(error => console.error('Error fetching JSON:', error));
+
+        // Function to select 10 random books
+        function getRandomBooks(data, count) {
+            const shuffled = data.sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
         }
 
-        function displayBook(index) {
-            const book = selectedBooks[index];
-            document.getElementById('book-title').textContent = book.title;
-            document.getElementById('book-author').textContent = book.author;
-            document.getElementById('book-year').textContent = book.year;
-            document.getElementById('book-genre').textContent = book.genre;
-            document.getElementById('book-publisher').textContent = book.publisher;
-        }
-
-        function nextBook() {
-            if (currentIndex < selectedBooks.length - 1) {
-                currentIndex++;
-                displayBook(currentIndex);
+        // Function to display the current book
+        function displayBook() {
+            if (currentIndex < books.length) {
+                document.getElementById('book-title').textContent = books[currentIndex].title;
             } else {
-                alert('You have reached the end of the list.');
+                document.getElementById('book-title').textContent = 'No more books to rate.';
+                document.getElementById('rating-form').style.display = 'none';
+                document.getElementById('next-book').style.display = 'none';
             }
         }
 
-        // Initial book display
-        displayBook(currentIndex);
+        // Event listener for the "Next Book" button
+        document.getElementById('next-book').addEventListener('click', () => {
+            const ratingForm = document.getElementById('rating-form');
+            const rating = ratingForm.querySelector('input[name="rating"]:checked');
+            if (rating) {
+                console.log(`Book: ${books[currentIndex].title}, Rating: ${rating.value}`);
+                currentIndex++;
+                ratingForm.reset();
+                displayBook();
+            } else {
+                alert('Please select a rating before proceeding.');
+            }
+        });
     </script>
 </body>
 </html>
