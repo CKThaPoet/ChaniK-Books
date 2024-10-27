@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Rating</title>
+    <title>African American Ancestor History</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #2c2c54;
+            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
         }
         #book-container {
-            background-color: #fff;
+            background-color: #4a4a70;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 1000px;
             text-align: center;
         }
         #rating-form {
@@ -27,14 +29,14 @@
         button {
             margin-top: 20px;
             padding: 10px;
-            background-color: #007BFF;
+            background-color: #ff6348;
             color: #fff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #e5533d;
         }
     </style>
 </head>
@@ -62,11 +64,14 @@
             </label><br>
         </form>
         <button id="next-book">Next Book</button>
+        <button id="show-recommendations" style="display:none;">Show Recommendations</button>
     </div>
 
     <script>
         let books = [];
         let currentIndex = 0;
+        let genrePreferences = {};
+        let ratedBooks = [];
 
         // Wait for the DOM to load before adding event listeners
         document.addEventListener('DOMContentLoaded', () => {
@@ -84,13 +89,24 @@
                 const ratingForm = document.getElementById('rating-form');
                 const rating = ratingForm.querySelector('input[name="rating"]:checked');
                 if (rating) {
-                    console.log(`Book: ${books[currentIndex].title}, Rating: ${rating.value}`);
+                    const currentBook = books[currentIndex];
+                    ratedBooks.push(currentBook);
+                    if (parseInt(rating.value) >= 3) {
+                        currentBook.genre.split(', ').forEach(genre => {
+                            genrePreferences[genre] = (genrePreferences[genre] || 0) + 1;
+                        });
+                    }
                     currentIndex++;
                     ratingForm.reset();
                     displayBook();
                 } else {
                     alert('Please select a rating before proceeding.');
                 }
+            });
+
+            // Event listener for the "Show Recommendations" button
+            document.getElementById('show-recommendations').addEventListener('click', () => {
+                showRecommendations();
             });
         });
 
@@ -108,7 +124,62 @@
                 document.getElementById('book-title').textContent = 'No more books to rate.';
                 document.getElementById('rating-form').style.display = 'none';
                 document.getElementById('next-book').style.display = 'none';
+                document.getElementById('show-recommendations').style.display = 'block';
             }
+        }
+
+        // Function to show recommendations based on top genres
+        function showRecommendations() {
+            const topGenres = Object.entries(genrePreferences)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(entry => entry[0]);
+
+            if (topGenres.length > 0) {
+                fetch('books.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        let recommendations = [];
+                        for (const genre of topGenres) {
+                            const genreBooks = data.filter(book => book.genre.includes(genre) && !ratedBooks.some(ratedBook => ratedBook.title === book.title));
+                            if (genreBooks.length > 0) {
+                                recommendations.push(genreBooks[0]);
+                            }
+                        }
+                        displayRecommendations(recommendations);
+                    })
+                    .catch(error => console.error('Error fetching JSON:', error));
+            }
+        }
+
+        // Function to display the recommendations
+        function displayRecommendations(recommendations) {
+            const bookContainer = document.getElementById('book-container');
+            bookContainer.innerHTML = '<h2>Recommended Books</h2>';
+            recommendations.forEach(book => {
+                const bookElement = document.createElement('p');
+                bookElement.textContent = `${book.title} by ${book.author} - Genre: ${book.genre}`;
+                bookContainer.appendChild(bookElement);
+            });
+            const rateMoreButton = document.createElement('button');
+            rateMoreButton.textContent = 'Rate More Books';
+            rateMoreButton.addEventListener('click', rateMoreBooks);
+            bookContainer.appendChild(rateMoreButton);
+        }
+
+        // Function to rate more books
+        function rateMoreBooks() {
+            fetch('books.json')
+                .then(response => response.json())
+                .then(data => {
+                    books = getRandomBooks(data.filter(book => !ratedBooks.some(ratedBook => ratedBook.title === book.title)), 10);
+                    currentIndex = 0;
+                    document.getElementById('rating-form').style.display = 'block';
+                    document.getElementById('next-book').style.display = 'block';
+                    document.getElementById('show-recommendations').style.display = 'none';
+                    displayBook();
+                })
+                .catch(error => console.error('Error fetching JSON:', error));
         }
     </script>
 </body>
