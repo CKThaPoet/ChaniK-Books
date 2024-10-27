@@ -3,68 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="books.css">
+   
     <title>Book Rating</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        #book-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            text-align: center;
-        }
-        #rating-form {
-            margin-top: 20px;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
-    <div id="book-container">
-        <h2 id="book-title">Loading...</h2>
-        <form id="rating-form">
-            <label>
-                <input type="radio" name="rating" value="1"> 1
-            </label><br>
-            <label>
-                <input type="radio" name="rating" value="2"> 2
-            </label><br>
-            <label>
-                <input type="radio" name="rating" value="3"> 3
-            </label><br>
-            <label>
-                <input type="radio" name="rating" value="4"> 4
-            </label><br>
-            <label>
-                <input type="radio" name="rating" value="5"> 5
-            </label><br>
-            <label>
-                <input type="radio" name="rating" value="haven't read"> Haven't read it
-            </label><br>
-        </form>
-        <button id="next-book">Next Book</button>
-    </div>
-
     <script>
         let books = [];
         let currentIndex = 0;
