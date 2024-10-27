@@ -48,6 +48,7 @@
 <body>
     <div id="book-container">
         <h2 id="book-title">Loading...</h2>
+        <p id="book-details"></p>
         <form id="rating-form">
             <label>
                 <input type="radio" name="rating" value="1"> 1
@@ -82,7 +83,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Fetch the JSON file
             fetch('books.json')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     books = getRandomBooks(data, 10);
                     displayBook();
@@ -124,7 +130,9 @@
         // Function to display the current book
         function displayBook() {
             if (currentIndex < books.length) {
-                document.getElementById('book-title').textContent = books[currentIndex].title;
+                const book = books[currentIndex];
+                document.getElementById('book-title').textContent = book.title;
+                document.getElementById('book-details').textContent = `Author: ${book.author}, Year: ${book.year}, Genre: ${book.genre}, Publisher: ${book.publisher}`;
             } else {
                 document.getElementById('book-title').textContent = 'No more books to rate.';
                 document.getElementById('rating-form').style.display = 'none';
@@ -142,7 +150,12 @@
 
             if (topGenres.length > 0) {
                 fetch('books.json')
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         let recommendations = [];
                         for (const genre of topGenres) {
@@ -163,7 +176,7 @@
             bookContainer.innerHTML = '<h2>Recommended Books</h2>';
             recommendations.forEach(book => {
                 const bookElement = document.createElement('p');
-                bookElement.textContent = `${book.title} by ${book.author} - Genre: ${book.genre}`;
+                bookElement.textContent = `${book.title} by ${book.author} - Genre: ${book.genre} - Year: ${book.year} - Publisher: ${book.publisher}`;
                 bookContainer.appendChild(bookElement);
             });
             const rateMoreButton = document.createElement('button');
@@ -175,7 +188,12 @@
         // Function to rate more books
         function rateMoreBooks() {
             fetch('books.json')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     books = getRandomBooks(data.filter(book => !ratedBooks.some(ratedBook => ratedBook.title === book.title)), 10);
                     currentIndex = 0;
