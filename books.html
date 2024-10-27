@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Rating</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .book-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .rating {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="book-container" id="book-container">
+        <h2 id="book-title"></h2>
+        <p><strong>Author:</strong> <span id="book-author"></span></p>
+        <p><strong>Year:</strong> <span id="book-year"></span></p>
+        <p><strong>Genre:</strong> <span id="book-genre"></span></p>
+        <p><strong>Publisher:</strong> <span id="book-publisher"></span></p>
+
+        <div class="rating">
+            <p>Rate this book:</p>
+            <label><input type="radio" name="rating" value="1"> 1</label>
+            <label><input type="radio" name="rating" value="2"> 2</label>
+            <label><input type="radio" name="rating" value="3"> 3</label>
+            <label><input type="radio" name="rating" value="4"> 4</label>
+            <label><input type="radio" name="rating" value="5"> 5</label>
+            <label><input type="radio" name="rating" value="haven't read"> Haven't read it</label>
+        </div>
+
+        <button onclick="nextBook()">Next Book</button>
+    </div>
+
+    <script>
+        const books = [
+            // Paste the JSON content here
+        ];
+
+        let currentIndex = 0;
+        const selectedBooks = getRandomBooks(books, 10);
+
+        function getRandomBooks(array, num) {
+            const shuffled = [...array].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, num);
+        }
+
+        function displayBook(index) {
+            const book = selectedBooks[index];
+            document.getElementById('book-title').textContent = book.title;
+            document.getElementById('book-author').textContent = book.author;
+            document.getElementById('book-year').textContent = book.year;
+            document.getElementById('book-genre').textContent = book.genre;
+            document.getElementById('book-publisher').textContent = book.publisher;
+        }
+
+        function nextBook() {
+            if (currentIndex < selectedBooks.length - 1) {
+                currentIndex++;
+                displayBook(currentIndex);
+            } else {
+                alert('You have reached the end of the list.');
+            }
+        }
+
+        // Initial book display
+        displayBook(currentIndex);
+    </script>
+</body>
+</html>
